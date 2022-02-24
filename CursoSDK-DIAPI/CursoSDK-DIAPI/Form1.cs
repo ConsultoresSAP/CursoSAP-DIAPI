@@ -56,5 +56,144 @@ namespace CursoSDK_DIAPI
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.CrearSN();
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Creado SN");
+                }
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.EditarSN("cliente01","Cliente01@gamail.com");
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Actualizado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.AddContactoSN("cliente01","Contacto3");
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Actualizado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.EditContacto("cliente01", 1);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Actualizado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.agregarDireccion("cliente01");
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Actualizado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.CrearItem();
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Articulo creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.AgregarAlmacen("Item001");
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Articulo modificado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }
