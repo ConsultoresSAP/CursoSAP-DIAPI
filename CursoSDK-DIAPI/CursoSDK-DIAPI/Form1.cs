@@ -195,5 +195,194 @@ namespace CursoSDK_DIAPI
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearPedido(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Pedido #"+DocEntry+" creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int DocEntry = 564;
+                sap.AgregarLineaPedido(DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Pedido #" + DocEntry.ToString() + " fue actualizado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.AgregarPedidoTipoServicio(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Pedido #" + DocEntry + " creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearEntrega(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Entrega #" + DocEntry + " creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearDevolucion(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Devolucion #" + DocEntry + " creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearSalida(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Salida #" + DocEntry + " creada con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button16_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearFacturaConDocumentoBase(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Factura #" + DocEntry + " creada con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearPedidoEnBaseABorrador(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Pedido #" + DocEntry + " creada con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button18_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                sap.CrearTransferencia(out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Transferencia #" + DocEntry + " creada con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }

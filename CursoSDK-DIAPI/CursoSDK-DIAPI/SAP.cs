@@ -368,8 +368,426 @@ namespace CursoSDK_DIAPI
             }
         }
 
+        #region Documents
+
+        public void CrearPedido(out string DocEntry)
+        {
+            SAPbobsCOM.Documents oPedido = null;
+            DocEntry = "";
+            try
+            {
+                this.Error = "";
+                oPedido = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oOrders);
+
+                oPedido.CardCode = "Cliente01";
+                oPedido.DocDate = DateTime.Today;
+                oPedido.DocDueDate = DateTime.Today;
+                oPedido.Comments = "Creado desde DI API";
+
+                oPedido.Lines.ItemCode = "A00001";
+                oPedido.Lines.Quantity = 5;
+                oPedido.Lines.TaxCode = "IVA";
+
+                oPedido.Lines.Add();
+
+                oPedido.Lines.ItemCode = "A00002";
+                oPedido.Lines.Quantity = 2;
+                oPedido.Lines.TaxCode = "IVA";
+
+                if (oPedido.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + " )";
+                }else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+            }
+            catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oPedido != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oPedido);
+                    oPedido = null;
+                }
+            }
+        }
+
+        public void AgregarLineaPedido(int DocEntry)
+        {
+            SAPbobsCOM.Documents oPedido = null;
+            try
+            {
+                this.Error = "";
+                oPedido = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oOrders);
+
+                if (oPedido.GetByKey(DocEntry))
+                {
+                    if(oPedido.DocumentStatus!= SAPbobsCOM.BoStatus.bost_Close)
+                    {
+                        oPedido.Lines.Add();
+                        oPedido.Lines.ItemCode = "A00003";
+                        oPedido.Lines.Quantity = 1;
+                        oPedido.Lines.TaxCode = "EXE";
+
+                        if (oPedido.Update() != 0)
+                        {
+                            this.Error= this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + " )";
+                        }
+                    }else
+                    {
+                        this.Error = "Documento ya esta cerrado";
+                    }
+                }else
+                {
+                    this.Error = "Documento no existe";
+                }
+
+            }catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oPedido != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oPedido);
+                    oPedido = null;
+                }
+            }
+        }
+
+        public void AgregarPedidoTipoServicio(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oPedido = null;
+            try
+            {
+                oPedido = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oOrders);
+
+                oPedido.CardCode = "Cliente01";
+                oPedido.DocDate = DateTime.Today;
+                oPedido.DocDueDate = DateTime.Today;
+                oPedido.Comments = "Pedido de tipo servicio creado por DI API";
+
+                oPedido.DocType = SAPbobsCOM.BoDocumentTypes.dDocument_Service;
+
+                oPedido.Lines.ItemDescription = "Servicio de ejemplo";
+                oPedido.Lines.AccountCode = "_SYS00000000001";
+                oPedido.Lines.LineTotal = 300;
+
+                if (oPedido.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + ") ";
+                }
+                else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
 
 
+            }catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oPedido != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oPedido);
+                    oPedido = null;
+                }
+            }
+        }
+
+
+        public void CrearEntrega(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oEntrega = null;
+            try
+            {
+                this.Error = "";
+                oEntrega = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oDeliveryNotes);
+                oEntrega.CardCode = "Cliente01";
+                oEntrega.DocDate = DateTime.Today;
+                oEntrega.DocDueDate = DateTime.Today;
+                oEntrega.Comments = "Entrega Creada desde DI API";
+                oEntrega.UserFields.Fields.Item("U_Comentario").Value = "Creando entrega desde DI API en UDF";
+
+                oEntrega.Lines.ItemCode = "A00001";
+                oEntrega.Lines.Quantity = 2;
+                oEntrega.Lines.TaxCode = "IVA";
+
+                oEntrega.Lines.Add();
+
+                oEntrega.Lines.ItemCode = "A00002";
+                oEntrega.Lines.Quantity = 1;
+                oEntrega.Lines.TaxCode = "IVA";
+
+                if (oEntrega.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + ") ";
+                }else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+            }
+            catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oEntrega != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oEntrega);
+                    oEntrega = null;
+                }
+            }
+        }
+
+
+        public void CrearDevolucion(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oDevolucion = null;
+            try
+            {
+                this.Error = "";
+                oDevolucion = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oReturns);
+
+                oDevolucion.CardCode = "Cliente01";
+                oDevolucion.DocDate = DateTime.Today;
+                oDevolucion.DocDueDate = DateTime.Today;
+
+                oDevolucion.Lines.ItemCode = "A00001";
+                oDevolucion.Lines.Quantity = 2;
+                oDevolucion.Lines.TaxCode = "IVA";
+                oDevolucion.Lines.UserFields.Fields.Item("U_Dscpton").Value="Valor de ejemplo";
+
+                if (oDevolucion.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + ") ";
+                }
+                else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+            }
+            catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oDevolucion != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oDevolucion);
+                    oDevolucion = null;
+                }
+            }
+        }
+
+
+        public void CrearSalida(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oSalida = null;
+            try
+            {
+                this.Error = "";
+                oSalida = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oInventoryGenExit);
+                oSalida.DocDate = DateTime.Today;
+                oSalida.DocDueDate = DateTime.Today;
+                oSalida.GroupNumber =-1;
+                
+
+                oSalida.Lines.ItemCode = "B10000";
+                oSalida.Lines.Quantity = 4;
+                oSalida.Lines.CostingCode = "10001";
+                oSalida.Lines.CostingCode2 = "20001";
+
+                oSalida.Lines.BatchNumbers.SetCurrentLine(0);
+                oSalida.Lines.BatchNumbers.Quantity = 4;
+                oSalida.Lines.BatchNumbers.BatchNumber = "B1-00067";
+                
+
+                if (oSalida.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription();
+                }else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+
+            }catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oSalida != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oSalida);
+                   oSalida = null;
+                }
+            }
+        }
+
+        public void CrearFacturaConDocumentoBase(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oFactura = null;
+            try
+            {
+                this.Error = "";
+                oFactura = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oInvoices);
+                oFactura.CardCode = "Cliente01";
+                oFactura.DocDate = DateTime.Today;
+                oFactura.DocDueDate = DateTime.Today;
+
+                oFactura.Lines.BaseType = (int)SAPbobsCOM.BoObjectTypes.oOrders;
+                oFactura.Lines.BaseEntry = 564;
+                oFactura.Lines.BaseLine = 0;
+                oFactura.Lines.TaxCode = "IVA";
+
+                oFactura.Lines.Add();
+                oFactura.Lines.BaseType = (int)SAPbobsCOM.BoObjectTypes.oOrders;
+                oFactura.Lines.BaseEntry = 564;
+                oFactura.Lines.BaseLine = 1;
+                oFactura.Lines.TaxCode = "IVA";
+
+                oFactura.Lines.Add();
+                oFactura.Lines.BaseType = (int)SAPbobsCOM.BoObjectTypes.oOrders;
+                oFactura.Lines.BaseEntry = 564;
+                oFactura.Lines.BaseLine = 2;
+                oFactura.Lines.TaxCode = "IVA";
+
+                if (oFactura.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription();
+                }else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+            }
+            catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oFactura != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oFactura);
+                    oFactura = null;
+                }
+            }
+        }
+
+        public void CrearPedidoEnBaseABorrador(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oPedido = null;
+            SAPbobsCOM.Documents Draft = null;
+            try
+            {
+                this.Error = "";
+                oPedido = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oOrders);
+                oPedido.CardCode = "Cliente01";
+                oPedido.DocDate = DateTime.Today;
+                oPedido.DocDueDate = DateTime.Today;
+
+                oPedido.Lines.BaseType = (int)SAPbobsCOM.BoObjectTypes.oDrafts;
+                oPedido.Lines.BaseEntry = 81;
+                oPedido.Lines.BaseLine = 0;
+                oPedido.Lines.TaxCode = "IVA";
+
+                if (oPedido.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription();
+                }
+                else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+            }
+            catch (Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oPedido != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oPedido);
+                    oPedido = null;
+                }
+            }
+        }
+
+
+        public void CrearTransferencia(out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.StockTransfer oTransferencia = null;
+            try
+            {
+                this.Error = "";
+                oTransferencia = (SAPbobsCOM.StockTransfer)this.oCom.GetBusinessObject(BoObjectTypes.oStockTransfer);
+                oTransferencia.CardCode = "Cliente01";
+                oTransferencia.DocDate = DateTime.Today;
+                oTransferencia.TaxDate = DateTime.Today;
+
+                oTransferencia.FromWarehouse = "01";
+                oTransferencia.ToWarehouse = "02";
+
+                oTransferencia.Lines.ItemCode = "A00001";
+                oTransferencia.Lines.Quantity = 5;
+                oTransferencia.Lines.FromWarehouseCode = "01";
+                oTransferencia.Lines.WarehouseCode = "5";
+
+                oTransferencia.Lines.Add();
+                oTransferencia.Lines.ItemCode = "A00002";
+                oTransferencia.Lines.Quantity = 5;
+
+
+                if (oTransferencia.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription();
+                }
+                else
+                {
+                    DocEntry = this.oCom.GetNewObjectKey();
+                }
+
+            }
+            catch (Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oTransferencia != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oTransferencia);
+                    oTransferencia = null;
+                }
+            }
+        }
+
+
+        #endregion
 
     }
 }
