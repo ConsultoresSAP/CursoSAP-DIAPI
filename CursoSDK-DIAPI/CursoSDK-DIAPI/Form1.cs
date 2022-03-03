@@ -384,5 +384,113 @@ namespace CursoSDK_DIAPI
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void button19_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int DocEntryFac = 221;
+                string DocEntryPago = "";
+                sap.CrearPago(DocEntryFac,out DocEntryPago);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Pago #" + DocEntryPago + " creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button20_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int DocEntryFac = 221;
+                string Datos = "";
+                sap.Record(DocEntryFac, out Datos);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show(Datos);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button21_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocNumFac = "221";
+                string DocEntryPago = "";
+                sap.CrearPago(DocNumFac, out DocEntryPago);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Pago #" + DocEntryPago + " creado con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button22_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string DocEntry = "";
+                string DocNumPedido = "478";
+                sap.CrearFacturaConDocumentoBase(DocNumPedido, out DocEntry);
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Factura #" + DocEntry + " creada con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button23_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.ActualizarListaDePrecios(2,1, "009-001-001-000001");
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Lista actualizada con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }

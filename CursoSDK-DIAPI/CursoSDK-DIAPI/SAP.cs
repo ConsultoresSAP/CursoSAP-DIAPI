@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SAPbobsCOM;
+using System.Xml;
 
 namespace CursoSDK_DIAPI
 {
-  
+
 
     class SAP
     {
@@ -42,14 +43,14 @@ namespace CursoSDK_DIAPI
                     if (ErrorCode != 0)
                     {
                         this.Error = this.oCom.GetLastErrorDescription() + " (" + ErrorCode.ToString() + " )";
-                    }else
+                    } else
                     {
                         this.CName = this.oCom.CompanyName;
                     }
                 }
 
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -70,7 +71,7 @@ namespace CursoSDK_DIAPI
                     }
                 }
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -103,7 +104,7 @@ namespace CursoSDK_DIAPI
                     this.Error = this.oCom.GetLastErrorDescription() + " ( " + this.oCom.GetLastErrorCode() + " )";
                 }
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -133,13 +134,13 @@ namespace CursoSDK_DIAPI
                     {
                         this.Error = this.oCom.GetLastErrorDescription() + " ( " + this.oCom.GetLastErrorCode() + " )";
                     }
-                }else
+                } else
                 {
                     this.Error = "SN no existe";
                 }
 
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -155,7 +156,7 @@ namespace CursoSDK_DIAPI
 
 
 
-        public void AddContactoSN(string CardCode,string Name)
+        public void AddContactoSN(string CardCode, string Name)
         {
             SAPbobsCOM.BusinessPartners oSN = null;
             try
@@ -167,7 +168,7 @@ namespace CursoSDK_DIAPI
                     if (oSN.ContactEmployees.Count > 1)
                     {
                         oSN.ContactEmployees.Add();
-                    }else
+                    } else
                     {
                         if (oSN.ContactEmployees.Name != "")
                         {
@@ -186,12 +187,12 @@ namespace CursoSDK_DIAPI
                         this.Error = this.oCom.GetLastErrorDescription() + " ( " + this.oCom.GetLastErrorCode() + " ) ";
                     }
 
-                }else
+                } else
                 {
                     this.Error = "SN no existe";
                 }
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -206,7 +207,7 @@ namespace CursoSDK_DIAPI
         }
 
 
-        public void EditContacto(string CardCode,int line)
+        public void EditContacto(string CardCode, int line)
         {
             SAPbobsCOM.BusinessPartners oSN = null;
             try
@@ -231,7 +232,7 @@ namespace CursoSDK_DIAPI
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -280,7 +281,7 @@ namespace CursoSDK_DIAPI
                     this.Error = "SN no existe";
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -314,7 +315,7 @@ namespace CursoSDK_DIAPI
                     this.Error = this.oCom.GetLastErrorDescription();
                 }
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -368,6 +369,46 @@ namespace CursoSDK_DIAPI
             }
         }
 
+
+        public void ActualizarListaDePrecios(int Lista, int ListaBase,string ItemCode)
+        {
+            SAPbobsCOM.Items Item = null;
+            try
+            {
+                this.Error = "";
+                Item = (SAPbobsCOM.Items)this.oCom.GetBusinessObject(BoObjectTypes.oItems);
+
+                double precio = 500;
+                double Factor = 3;
+
+                if (Item.GetByKey(ItemCode))
+                {
+                    Item.PriceList.SetCurrentLine(Lista);
+                    Item.PriceList.BasePriceList = ListaBase;
+                    Item.PriceList.Price = precio;
+                    //Item.PriceList.Factor = Factor;
+
+                    if (Item.Update() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                }else
+                {
+                    this.Error = "Articulo no existe";
+                }
+
+            }catch(Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+
+            }
+        }
+
+
+
         #region Documents
 
         public void CrearPedido(out string DocEntry)
@@ -397,13 +438,13 @@ namespace CursoSDK_DIAPI
                 if (oPedido.Add() != 0)
                 {
                     this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + " )";
-                }else
+                } else
                 {
                     DocEntry = this.oCom.GetNewObjectKey();
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -427,7 +468,7 @@ namespace CursoSDK_DIAPI
 
                 if (oPedido.GetByKey(DocEntry))
                 {
-                    if(oPedido.DocumentStatus!= SAPbobsCOM.BoStatus.bost_Close)
+                    if (oPedido.DocumentStatus != SAPbobsCOM.BoStatus.bost_Close)
                     {
                         oPedido.Lines.Add();
                         oPedido.Lines.ItemCode = "A00003";
@@ -436,18 +477,18 @@ namespace CursoSDK_DIAPI
 
                         if (oPedido.Update() != 0)
                         {
-                            this.Error= this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + " )";
+                            this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + " )";
                         }
-                    }else
+                    } else
                     {
                         this.Error = "Documento ya esta cerrado";
                     }
-                }else
+                } else
                 {
                     this.Error = "Documento no existe";
                 }
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -490,7 +531,7 @@ namespace CursoSDK_DIAPI
                 }
 
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -532,13 +573,13 @@ namespace CursoSDK_DIAPI
                 if (oEntrega.Add() != 0)
                 {
                     this.Error = this.oCom.GetLastErrorDescription() + " (" + this.oCom.GetLastErrorCode() + ") ";
-                }else
+                } else
                 {
                     DocEntry = this.oCom.GetNewObjectKey();
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -569,7 +610,7 @@ namespace CursoSDK_DIAPI
                 oDevolucion.Lines.ItemCode = "A00001";
                 oDevolucion.Lines.Quantity = 2;
                 oDevolucion.Lines.TaxCode = "IVA";
-                oDevolucion.Lines.UserFields.Fields.Item("U_Dscpton").Value="Valor de ejemplo";
+                oDevolucion.Lines.UserFields.Fields.Item("U_Dscpton").Value = "Valor de ejemplo";
 
                 if (oDevolucion.Add() != 0)
                 {
@@ -581,7 +622,7 @@ namespace CursoSDK_DIAPI
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -606,8 +647,8 @@ namespace CursoSDK_DIAPI
                 oSalida = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oInventoryGenExit);
                 oSalida.DocDate = DateTime.Today;
                 oSalida.DocDueDate = DateTime.Today;
-                oSalida.GroupNumber =-1;
-                
+                oSalida.GroupNumber = -1;
+
 
                 oSalida.Lines.ItemCode = "B10000";
                 oSalida.Lines.Quantity = 4;
@@ -617,18 +658,18 @@ namespace CursoSDK_DIAPI
                 oSalida.Lines.BatchNumbers.SetCurrentLine(0);
                 oSalida.Lines.BatchNumbers.Quantity = 4;
                 oSalida.Lines.BatchNumbers.BatchNumber = "B1-00067";
-                
+
 
                 if (oSalida.Add() != 0)
                 {
                     this.Error = this.oCom.GetLastErrorDescription();
-                }else
+                } else
                 {
                     DocEntry = this.oCom.GetNewObjectKey();
                 }
 
 
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -637,7 +678,7 @@ namespace CursoSDK_DIAPI
                 if (oSalida != null)
                 {
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(oSalida);
-                   oSalida = null;
+                    oSalida = null;
                 }
             }
         }
@@ -674,13 +715,13 @@ namespace CursoSDK_DIAPI
                 if (oFactura.Add() != 0)
                 {
                     this.Error = this.oCom.GetLastErrorDescription();
-                }else
+                } else
                 {
                     DocEntry = this.oCom.GetNewObjectKey();
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Error = e.Message;
             }
@@ -694,6 +735,83 @@ namespace CursoSDK_DIAPI
             }
         }
 
+        public void CrearFacturaConDocumentoBase(string DocNumPedido,out string DocEntry)
+        {
+            DocEntry = "";
+            SAPbobsCOM.Documents oFactura = null;
+            SAPbobsCOM.Recordset oRecord = null;
+            try
+            {
+                this.Error = "";
+                oFactura = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oInvoices);
+                oRecord = (SAPbobsCOM.Recordset)this.oCom.GetBusinessObject(BoObjectTypes.BoRecordset);
+
+                if (this.oCom.DbServerType == SAPbobsCOM.BoDataServerTypes.dst_HANADB)
+                {
+                    oRecord.DoQuery("CALL PedidoBase  ('" + DocNumPedido+"')");
+                }
+                else
+                {
+                    oRecord.DoQuery("EXEC PedidoBase " + DocNumPedido);
+                }
+                
+
+                if (oRecord.RecordCount > 0)
+                {
+                    oRecord.MoveFirst();
+                    oFactura.CardCode = oRecord.Fields.Item("SN").Value.ToString();
+                    oFactura.DocDate = DateTime.Today;
+                    oFactura.DocDueDate = DateTime.Today;
+
+                    for(int i = 0; i < oRecord.RecordCount; i++)
+                    {
+                        if (i != 0)
+                        {
+                            oFactura.Lines.Add();
+                        }
+                        oFactura.Lines.BaseType = (int)SAPbobsCOM.BoObjectTypes.oOrders;
+                        oFactura.Lines.BaseEntry = Int32.Parse(oRecord.Fields.Item("N. Interno").Value.ToString());
+                        oFactura.Lines.BaseLine = Int32.Parse(oRecord.Fields.Item("Linea").Value.ToString());
+                        oFactura.Lines.TaxCode = oRecord.Fields.Item("Impuesto").Value.ToString();
+                        oRecord.MoveNext();
+                    }
+
+                    if (oFactura.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                    else
+                    {
+                        DocEntry = this.oCom.GetNewObjectKey();
+                    }
+                }
+                else
+                {
+                    this.Error = "Pedido no encontrado";
+                }
+
+                
+
+            }
+            catch (Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oFactura != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oFactura);
+                    oFactura = null;
+                }
+                if (oRecord != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord);
+                    oRecord = null;
+                }
+            }
+        }
+
         public void CrearPedidoEnBaseABorrador(out string DocEntry)
         {
             DocEntry = "";
@@ -702,27 +820,67 @@ namespace CursoSDK_DIAPI
             try
             {
                 this.Error = "";
-                oPedido = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oOrders);
-                oPedido.CardCode = "Cliente01";
-                oPedido.DocDate = DateTime.Today;
-                oPedido.DocDueDate = DateTime.Today;
+                this.oCom.XmlExportType = SAPbobsCOM.BoXmlExportTypes.xet_ExportImportMode;
+                this.oCom.XMLAsString = false;
+                string rutaXml = @"C:\Users\User-02\Desktop\CursoSAP DI API\CursoSDK-DIAPI\XmlBorrador.xml";
+                XmlDocument XmlBorrador = new XmlDocument();
+                XmlNode NodeDocObjectCode;
+                XmlNode NodeDocNum;
+                XmlNode Node;
+                Draft = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oDrafts);
 
-                oPedido.Lines.BaseType = (int)SAPbobsCOM.BoObjectTypes.oDrafts;
-                oPedido.Lines.BaseEntry = 81;
-                oPedido.Lines.BaseLine = 0;
-                oPedido.Lines.TaxCode = "IVA";
+                if (Draft.GetByKey(88))
+                {
+                    Draft.SaveXML(ref rutaXml);
 
-                if (oPedido.Add() != 0)
+                    XmlBorrador.Load(rutaXml);
+                    XmlBorrador.SelectSingleNode("BOM/BO/AdmInfo/Object").InnerText = "17";
+                    NodeDocNum = XmlBorrador.SelectSingleNode("BOM/BO/Documents/row/DocNum");
+                    XmlBorrador.SelectSingleNode("BOM/BO/Documents/row").RemoveChild(NodeDocNum);
+
+                    NodeDocObjectCode = XmlBorrador.SelectSingleNode("BOM/BO/Documents/row/DocObjectCode");
+                    XmlBorrador.SelectSingleNode("BOM/BO/Documents/row").RemoveChild(NodeDocObjectCode);
+
+                    Node = XmlBorrador.SelectSingleNode("BOM/BO/Documents/row/ReqType");
+                    XmlBorrador.SelectSingleNode("BOM/BO/Documents/row").RemoveChild(Node);
+                    Node = XmlBorrador.SelectSingleNode("BOM/BO/Documents/row/Revision");
+                    XmlBorrador.SelectSingleNode("BOM/BO/Documents/row").RemoveChild(Node);
+                    Node = XmlBorrador.SelectSingleNode("BOM/BO/Documents/row/IssuingReason");
+                    XmlBorrador.SelectSingleNode("BOM/BO/Documents/row").RemoveChild(Node);
+
+                    for (int i = 0; i < XmlBorrador.SelectNodes("BOM/BO/Document_Lines/row").Count; i++)
+                    {
+                        var NodoActual = XmlBorrador.SelectNodes("BOM/BO/Document_Lines/row")[i];
+                        Node = NodoActual.SelectSingleNode("EnableReturnCost");
+                        XmlBorrador.SelectNodes("BOM/BO/Document_Lines/row")[i].RemoveChild(Node);
+                        Node = NodoActual.SelectSingleNode("ReturnCost");
+                        XmlBorrador.SelectNodes("BOM/BO/Document_Lines/row")[i].RemoveChild(Node);
+                        Node = NodoActual.SelectSingleNode("LineVendor");
+                        XmlBorrador.SelectNodes("BOM/BO/Document_Lines/row")[i].RemoveChild(Node);
+                    }
+
+
+                    XmlBorrador.Save(rutaXml);
+
+                    oPedido = (SAPbobsCOM.Documents)this.oCom.GetBusinessObjectFromXML(rutaXml, 0);
+
+                    if (oPedido.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                    else
+                    {
+                        DocEntry = this.oCom.GetNewObjectKey();
+                        Draft.Remove();
+                    }
+                } else
                 {
-                    this.Error = this.oCom.GetLastErrorDescription();
+                    this.Error = "Borrador no existe";
                 }
-                else
-                {
-                    DocEntry = this.oCom.GetNewObjectKey();
-                }
+
 
             }
-            catch (Exception e)
+            catch (System.Runtime.InteropServices.COMException e)
             {
                 this.Error = e.Message;
             }
@@ -733,9 +891,19 @@ namespace CursoSDK_DIAPI
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(oPedido);
                     oPedido = null;
                 }
+                if (Draft != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Draft);
+                    Draft = null;
+                }
             }
         }
 
+
+
+
+
+        #endregion
 
         public void CrearTransferencia(out string DocEntry)
         {
@@ -786,8 +954,186 @@ namespace CursoSDK_DIAPI
             }
         }
 
+        public void CrearPago(int DocEntryFact, out string DocEntryPago)
+        {
+            DocEntryPago = "";
+            SAPbobsCOM.Payments oPago = null;
+            SAPbobsCOM.Documents oFactura = null;
+            try
+            {
+                this.Error = "";
+                oPago = (SAPbobsCOM.Payments)this.oCom.GetBusinessObject(BoObjectTypes.oIncomingPayments);
+                oFactura = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oInvoices);
 
-        #endregion
+                if (oFactura.GetByKey(DocEntryFact))
+                {
+                    oPago.CardCode = oFactura.CardCode;
+                    oPago.DocDate = DateTime.Today;
+                    oPago.DueDate = DateTime.Today;
+
+                    //Medios de Pago
+
+                    //Efectivo
+                    //oPago.CashSum = oFactura.DocTotal;
+                    oPago.CashSum = 1000;
+
+                    //Transferencias
+                    oPago.TransferAccount = "_SYS00000000001";
+                    oPago.TransferDate = DateTime.Today;
+                    oPago.TransferReference = "89452315";
+                    oPago.TransferSum = 1000;
+
+                    //Cheques
+                    oPago.Checks.DueDate = DateTime.Today;
+                    oPago.Checks.CheckSum = 1000;
+                    oPago.Checks.CountryCode = "GT";
+                    oPago.Checks.BankCode = "BBANK";
+                    oPago.Checks.AccounttNum = "89451265785";
+                    oPago.Checks.CheckNumber = 894523;
+                    oPago.Checks.Trnsfrable = SAPbobsCOM.BoYesNoEnum.tYES;
+
+
+                    //TC
+                    oPago.CreditCards.CreditCard = 2;
+                    oPago.CreditCards.CreditCardNumber = "1234567891232541";
+                    oPago.CreditCards.CardValidUntil = DateTime.Parse("10/10/26");
+                    oPago.CreditCards.VoucherNum = "4523152";
+                    oPago.CreditCards.CreditSum = 1000;
+
+                    oPago.Invoices.DocEntry = DocEntryFact;
+                    oPago.Invoices.SumApplied = 4000;
+
+                    if (oPago.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                    else
+                    {
+                        DocEntryPago = this.oCom.GetNewObjectKey();
+                    }
+
+                }
+                else
+                {
+                    this.Error = "Factura no existe";
+                }
+
+            }
+            catch (Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+
+            }
+        }
+
+        public void CrearPago(string DocNumFact, out string DocEntryPago)
+        {
+            DocEntryPago = "";
+            SAPbobsCOM.Payments oPago = null;
+            SAPbobsCOM.Recordset oRecord = null;
+            try
+            {
+                this.Error = "";
+                oPago = (SAPbobsCOM.Payments)this.oCom.GetBusinessObject(BoObjectTypes.oIncomingPayments);
+                oRecord = (SAPbobsCOM.Recordset)this.oCom.GetBusinessObject(BoObjectTypes.BoRecordset);
+
+                oRecord.DoQuery("SELECT (T0.DocTotal-T0.PaidToDate) AS 'Pendiente',T0.[CardCode],T0.[DocEntry] " +
+                                "FROM [OINV] T0 WHERE T0.[DocNum]= " + DocNumFact);
+
+                if (oRecord.RecordCount > 0)
+                {
+                    oPago.CardCode = oRecord.Fields.Item("CardCode").Value.ToString();
+                    oPago.DocDate = DateTime.Today;
+                    oPago.DueDate = DateTime.Today;
+
+                    oPago.CashSum = Double.Parse(oRecord.Fields.Item("Pendiente").Value.ToString());
+
+
+
+                    oPago.Invoices.DocEntry = Int32.Parse(oRecord.Fields.Item("DocEntry").Value.ToString());
+                    oPago.Invoices.SumApplied = Double.Parse(oRecord.Fields.Item("Pendiente").Value.ToString());
+
+                    if (oPago.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                    else
+                    {
+                        DocEntryPago = this.oCom.GetNewObjectKey();
+                    }
+
+                }
+                else
+                {
+                    this.Error = "Factura no existe";
+                }
+
+            }
+            catch (Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oPago != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oPago);
+                    oPago = null;
+                }
+            }
+
+        }
+
+
+
+        public void Record(int DocEntryFact, out string Datos)
+        {
+            Datos = "";
+            SAPbobsCOM.Recordset oRecord = null;
+            try
+            {
+                this.Error = "";
+                oRecord = (SAPbobsCOM.Recordset)this.oCom.GetBusinessObject(BoObjectTypes.BoRecordset);
+                string Consulta = "";
+                if (this.oCom.DbServerType == SAPbobsCOM.BoDataServerTypes.dst_HANADB)
+                {
+                    Consulta = "SELECT * FROM \"OINV\" T0 WHERE T0.\"DocEntry\"= " + DocEntryFact.ToString();
+                }
+                else
+                {
+                    Consulta = "SELECT * FROM [dbo].[OINV] T0 WHERE T0.[DocEntry]= " + DocEntryFact.ToString();
+                }
+
+
+                oRecord.DoQuery(Consulta);
+
+                if (oRecord.RecordCount > 0)
+                {
+                    Datos = "Cliente: " + oRecord.Fields.Item("CardCode").Value.ToString() + "-" + oRecord.Fields.Item("CardName").Value.ToString() +
+                        ", Total Factuta: " + oRecord.Fields.Item("DocTotal").Value.ToString();
+                }
+                else
+                {
+                    this.Error = "No hay datos";
+                }
+
+            }
+            catch (Exception e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oRecord != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord);
+                    oRecord = null;
+                }
+            }
+        }
 
     }
 }
