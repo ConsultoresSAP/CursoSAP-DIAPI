@@ -8,7 +8,11 @@ using System.Xml;
 
 namespace CursoSDK_DIAPI
 {
-
+    class ValoresValidos
+    {
+        public string Code { get; set; }
+        public string Desc { get; set; }
+    }
 
     class SAP
     {
@@ -246,7 +250,6 @@ namespace CursoSDK_DIAPI
             }
         }
 
-
         public void agregarDireccion(string CardCode)
         {
             SAPbobsCOM.BusinessPartners oSN = null;
@@ -295,7 +298,6 @@ namespace CursoSDK_DIAPI
             }
         }
 
-
         public void CrearItem()
         {
             SAPbobsCOM.Items oItem = null;
@@ -328,7 +330,6 @@ namespace CursoSDK_DIAPI
                 }
             }
         }
-
 
         public void AgregarAlmacen(string ItemCode)
         {
@@ -369,7 +370,6 @@ namespace CursoSDK_DIAPI
             }
         }
 
-
         public void ActualizarListaDePrecios(int Lista, int ListaBase,string ItemCode)
         {
             SAPbobsCOM.Items Item = null;
@@ -378,15 +378,15 @@ namespace CursoSDK_DIAPI
                 this.Error = "";
                 Item = (SAPbobsCOM.Items)this.oCom.GetBusinessObject(BoObjectTypes.oItems);
 
-                double precio = 500;
-                double Factor = 3;
+                double precio = 400;
+                double Factor = 2;
 
                 if (Item.GetByKey(ItemCode))
                 {
                     Item.PriceList.SetCurrentLine(Lista);
                     Item.PriceList.BasePriceList = ListaBase;
                     Item.PriceList.Price = precio;
-                    //Item.PriceList.Factor = Factor;
+                    Item.PriceList.Factor = Factor;
 
                     if (Item.Update() != 0)
                     {
@@ -406,8 +406,6 @@ namespace CursoSDK_DIAPI
 
             }
         }
-
-
 
         #region Documents
 
@@ -1087,8 +1085,6 @@ namespace CursoSDK_DIAPI
 
         }
 
-
-
         public void Record(int DocEntryFact, out string Datos)
         {
             Datos = "";
@@ -1134,6 +1130,329 @@ namespace CursoSDK_DIAPI
                 }
             }
         }
+
+
+        public void CrearTabla(string Nombre, string Desc, SAPbobsCOM.BoUTBTableType Type)
+        {
+            SAPbobsCOM.IUserTablesMD oTabla = null;
+            try
+            {
+                this.Error = "";
+                oTabla = (SAPbobsCOM.IUserTablesMD)this.oCom.GetBusinessObject(BoObjectTypes.oUserTables);
+
+                if (!oTabla.GetByKey(Nombre))
+                {
+                    oTabla.TableName = Nombre;
+                    oTabla.TableDescription = Desc;
+                    oTabla.TableType = Type;
+
+                    if (oTabla.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                }else
+                {
+                    this.Error = "Tabla ya existe";
+                }
+
+            }catch(System.Runtime.InteropServices.COMException e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oTabla != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oTabla);
+                    oTabla = null;
+                    GC.Collect();
+                }
+            }
+        }
+
+
+        public void CrearOActualizarUDF(string Tabla, string Code, string Desc, int Tam,
+                            SAPbobsCOM.BoFieldTypes Type, SAPbobsCOM.BoFldSubTypes SubType,
+                            SAPbobsCOM.BoYesNoEnum Obligatorio, string TablaEnlazada,
+                            List<ValoresValidos> ValoresValidos,string ValorDefecto)
+        {
+            SAPbobsCOM.UserFieldsMD oUDF = null;
+            SAPbobsCOM.Recordset oRecord = null;
+            try
+            {
+                this.Error = "";
+                oUDF = (SAPbobsCOM.UserFieldsMD)this.oCom.GetBusinessObject(BoObjectTypes.oUserFields);
+                oRecord = (SAPbobsCOM.Recordset)this.oCom.GetBusinessObject(BoObjectTypes.BoRecordset);
+
+                int Key;
+                bool Existe = false;
+                oRecord.DoQuery("SELECT T0.[FieldID] FROM [CUFD] T0 WHERE T0.[TableID]='" + Tabla + "' AND T0.[AliasID]='" + Code + "'");
+                if (oRecord.RecordCount > 0)
+                {
+                    Key = Int32.Parse(oRecord.Fields.Item("FieldID").Value.ToString());
+                    oUDF.GetByKey(Tabla, Key);
+                    Existe = true;
+                }
+
+                if (oRecord != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord);
+                    oRecord = null;
+                }
+
+                oUDF.TableName = Tabla;
+                oUDF.Name = Code;
+                oUDF.Description = Desc;
+                oUDF.Size = Tam;
+                oUDF.Type = Type;
+                oUDF.SubType = SubType;
+                oUDF.Mandatory = Obligatorio;
+
+                if (TablaEnlazada != "")
+                {
+                    oUDF.LinkedTable = TablaEnlazada;
+                }
+                if (ValorDefecto != "")
+                {
+                    oUDF.DefaultValue = ValorDefecto;
+                }
+
+                if (ValoresValidos != null)
+                {
+                    for(int i = 0; i < ValoresValidos.Count; i++)
+                    {
+                        oUDF.ValidValues.Value = ValoresValidos[i].Code;
+                        oUDF.ValidValues.Description = ValoresValidos[i].Desc;
+                        oUDF.ValidValues.Add();
+                    }
+                }
+
+                if (Existe)
+                {
+                    if (oUDF.Update() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                }else
+                {
+                    if (oUDF.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                    }
+                }
+
+            }catch(System.Runtime.InteropServices.COMException e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (oUDF != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oUDF);
+                    oUDF = null;
+                    GC.Collect();
+                }
+            }
+        }
+
+
+        public void CrearUDO()
+        {
+            SAPbobsCOM.UserObjectsMD UDO = null;
+            try
+            {
+                this.Error = "";
+                UDO = (SAPbobsCOM.UserObjectsMD)this.oCom.GetBusinessObject(BoObjectTypes.oUserObjectsMD);
+
+                UDO.Code = "UDO_EJM";
+                UDO.Name = "UDO de ejemplo";
+                UDO.ObjectType = SAPbobsCOM.BoUDOObjType.boud_Document;
+                UDO.TableName = "TABLAPADRE";
+
+                UDO.CanFind = SAPbobsCOM.BoYesNoEnum.tYES;
+                UDO.CanClose = SAPbobsCOM.BoYesNoEnum.tYES;
+                UDO.CanDelete = SAPbobsCOM.BoYesNoEnum.tNO;
+                UDO.CanCancel = SAPbobsCOM.BoYesNoEnum.tYES;
+                UDO.CanCreateDefaultForm = SAPbobsCOM.BoYesNoEnum.tNO;
+
+                //UDO.FindColumns.ColumnAlias = "U_NUMERO";
+                //UDO.FindColumns.Add();
+
+                UDO.ChildTables.TableName = "TablaHija";
+                UDO.ChildTables.Add();
+
+                if (UDO.Add() != 0)
+                {
+                    this.Error = this.oCom.GetLastErrorDescription();
+                }
+
+            }catch(System.Runtime.InteropServices.COMException e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (UDO != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(UDO);
+                    UDO = null;
+                }
+            }
+        }
+
+        public void AgregarDatosUDO()
+        {
+            SAPbobsCOM.CompanyService OCompanyServices = null;
+            SAPbobsCOM.GeneralService OGeneralServices = null;
+            SAPbobsCOM.GeneralData OGeneralData = null;
+            SAPbobsCOM.GeneralDataParams OGeneralDataParams = null;
+
+            SAPbobsCOM.GeneralDataCollection Lineas = null;
+            SAPbobsCOM.GeneralData Linea = null;
+            try
+            {
+                this.Error = "";
+                OCompanyServices = this.oCom.GetCompanyService();
+                OGeneralServices = OCompanyServices.GetGeneralService("VISITVEN");
+
+                OGeneralData = ((SAPbobsCOM.GeneralData)(OGeneralServices.GetDataInterface(SAPbobsCOM.GeneralServiceDataInterfaces.gsGeneralData)));
+
+                OGeneralData.SetProperty("U_CodVendedor", "V0001");
+                OGeneralData.SetProperty("U_Nombre", "Juan Perez");
+                OGeneralData.SetProperty("U_Fecha", DateTime.Today);
+                OGeneralData.SetProperty("U_Comentarios", "Visitas de hoy");
+
+                Lineas = OGeneralData.Child("VISITASVENDEDOR1");
+
+                Linea = Lineas.Add();
+                Linea.SetProperty("U_CodCliente", "Cliente01");
+                Linea.SetProperty("U_Nombre", "Cliente de prueba numero");
+                Linea.SetProperty("U_Usunto", "Cosas Varias");//Asunto
+                Linea.SetProperty("U_Preoridad", "Alta");//Prioridad
+
+                OGeneralDataParams = OGeneralServices.Add(OGeneralData);
+
+            }
+            catch (System.Runtime.InteropServices.COMException e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (OCompanyServices != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OCompanyServices);
+                    OCompanyServices = null;
+                }
+                if (OGeneralServices != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OGeneralServices);
+                    OGeneralServices = null;
+                }
+                if (OGeneralData != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OGeneralData);
+                    OGeneralData = null;
+                }
+                if (OGeneralDataParams != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OGeneralDataParams);
+                    OGeneralDataParams = null;
+                }
+                if (Lineas != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Lineas);
+                    Lineas = null;
+                }
+                if(Linea != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Linea);
+                    Linea = null;
+                }
+            }
+        }
+
+        public void EditarDatosUDO(int DocEntry)
+        {
+            SAPbobsCOM.CompanyService OCompanyServices = null;
+            SAPbobsCOM.GeneralService OGeneralServices = null;
+            SAPbobsCOM.GeneralData OGeneralData = null;
+            SAPbobsCOM.GeneralDataParams OGeneralDataParams = null;
+
+            SAPbobsCOM.GeneralDataCollection Lineas = null;
+            SAPbobsCOM.GeneralData Linea = null;
+            try
+            {
+                this.Error = "";
+                OCompanyServices = this.oCom.GetCompanyService();
+                OGeneralServices = OCompanyServices.GetGeneralService("VISITVEN");
+
+                OGeneralDataParams = ((SAPbobsCOM.GeneralDataParams)(OGeneralServices.GetDataInterface(SAPbobsCOM.GeneralServiceDataInterfaces.gsGeneralDataParams)));
+                OGeneralDataParams.SetProperty("DocEntry", DocEntry);
+
+                OGeneralData = OGeneralServices.GetByParams(OGeneralDataParams);
+
+                OGeneralData.SetProperty("U_Comentarios", "Visitas de hoy, con nuevo cliente");
+
+                Lineas = OGeneralData.Child("VISITASVENDEDOR1");
+
+                //Agregar Linea
+                Linea = Lineas.Add();
+                Linea.SetProperty("U_CodCliente", "CL03");
+                Linea.SetProperty("U_Nombre", "Cliente TEST");
+                Linea.SetProperty("U_Usunto", "Cosas Varias");//Asunto
+                Linea.SetProperty("U_Preoridad", "Baja");//Prioridad
+
+                //Editar linea
+                //Linea = Lineas.Item(0);
+                //Linea.SetProperty("U_Preoridad", "Baja");//Prioridad
+
+                OGeneralServices.Update(OGeneralData);
+
+            }
+            catch (System.Runtime.InteropServices.COMException e)
+            {
+                this.Error = e.Message;
+            }
+            finally
+            {
+                if (OCompanyServices != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OCompanyServices);
+                    OCompanyServices = null;
+                }
+                if (OGeneralServices != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OGeneralServices);
+                    OGeneralServices = null;
+                }
+                if (OGeneralData != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OGeneralData);
+                    OGeneralData = null;
+                }
+                if (OGeneralDataParams != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(OGeneralDataParams);
+                    OGeneralDataParams = null;
+                }
+                if (Lineas != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Lineas);
+                    Lineas = null;
+                }
+                if (Linea != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Linea);
+                    Linea = null;
+                }
+            }
+        }
+
+
+
+
 
     }
 }
