@@ -1451,7 +1451,103 @@ namespace CursoSDK_DIAPI
         }
 
 
+        public void EjemploTransaction()
+        {
+            SAPbobsCOM.Documents Factura = null;
+            SAPbobsCOM.Payments Pago = null;
+            try
+            {
+                this.Error = "";
+                string DocEntry = "";
+                Factura = (SAPbobsCOM.Documents)this.oCom.GetBusinessObject(BoObjectTypes.oInvoices);
+                Pago = (SAPbobsCOM.Payments)this.oCom.GetBusinessObject(BoObjectTypes.oIncomingPayments);
 
+                if (!this.oCom.InTransaction)
+                {
+                    this.oCom.StartTransaction();
+                }
+
+                if (this.oCom.InTransaction)
+                {
+                    Factura.CardCode = "Cliente01";
+                    Factura.DocDate = DateTime.Today;
+                    Factura.DocDueDate = DateTime.Today;
+                    Factura.Comments = "Factura creada en proceso de Transaction 2";
+
+                    Factura.Lines.ItemCode = "A00001";
+                    Factura.Lines.Quantity = 2;
+                    Factura.Lines.TaxCode = "IVA";
+
+                    if (Factura.Add() != 0)
+                    {
+                        this.Error = this.oCom.GetLastErrorDescription();
+                        if (this.oCom.InTransaction)
+                        {
+                            this.oCom.EndTransaction(BoWfTransOpt.wf_RollBack);
+                        }
+                    }else
+                    {
+                        DocEntry = this.oCom.GetNewObjectKey();
+                        if (Factura.GetByKey(Int32.Parse(DocEntry)))
+                        {
+                            Pago.CardCode = Factura.CardCode;
+                            Pago.DocDate = DateTime.Today;
+
+                            Pago.CashSum = Factura.DocTotal;
+
+                            Pago.Invoices.DocEntry = Factura.DocEntry;
+                            Pago.Invoices.TotalDiscount = 0;
+                            Pago.Invoices.SumApplied = Factura.DocTotal;
+
+                            if (Pago.Add() != 0)
+                            {
+                                this.Error = this.oCom.GetLastErrorDescription();
+                                if (this.oCom.InTransaction)
+                                {
+                                    this.oCom.EndTransaction(BoWfTransOpt.wf_RollBack);
+                                }
+                            }else
+                            {
+                                if (this.oCom.InTransaction)
+                                {
+                                    this.oCom.EndTransaction(BoWfTransOpt.wf_Commit);
+                                }
+                            }
+                        }
+                        
+
+                    }
+                }
+                
+
+            }catch(Exception e)
+            {
+                this.Error = e.Message;
+                if (this.oCom.InTransaction)
+                {
+                    this.oCom.EndTransaction(BoWfTransOpt.wf_RollBack);
+                }
+            }finally
+            {
+                if (this.oCom != null)
+                {
+                    if (this.oCom.InTransaction)
+                    {
+                        this.oCom.EndTransaction(BoWfTransOpt.wf_RollBack);
+                    }
+                }
+                if (Factura != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Factura);
+                    Factura = null;
+                }
+                if (Pago != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(Pago);
+                    Pago = null;
+                }
+            }
+        }
 
 
     }

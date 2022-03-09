@@ -619,5 +619,25 @@ namespace CursoSDK_DIAPI
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void button29_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                sap.EjemploTransaction();
+                if (this.sap.Error != "")
+                {
+                    MessageBox.Show("Error: " + sap.Error);
+                }
+                else
+                {
+                    MessageBox.Show("Documentos Creados con exito");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }

@@ -56,6 +56,7 @@
             this.button26 = new System.Windows.Forms.Button();
             this.button27 = new System.Windows.Forms.Button();
             this.button28 = new System.Windows.Forms.Button();
+            this.button29 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -338,11 +339,22 @@
             this.button28.UseVisualStyleBackColor = true;
             this.button28.Click += new System.EventHandler(this.button28_Click);
             // 
+            // button29
+            // 
+            this.button29.Location = new System.Drawing.Point(473, 296);
+            this.button29.Name = "button29";
+            this.button29.Size = new System.Drawing.Size(102, 50);
+            this.button29.TabIndex = 28;
+            this.button29.Text = "Factura de contado";
+            this.button29.UseVisualStyleBackColor = true;
+            this.button29.Click += new System.EventHandler(this.button29_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(666, 393);
+            this.Controls.Add(this.button29);
             this.Controls.Add(this.button28);
             this.Controls.Add(this.button27);
             this.Controls.Add(this.button26);
@@ -407,6 +419,7 @@
         private System.Windows.Forms.Button button26;
         private System.Windows.Forms.Button button27;
         private System.Windows.Forms.Button button28;
+        private System.Windows.Forms.Button button29;
     }
 }
 
